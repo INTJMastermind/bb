@@ -1,11 +1,16 @@
 '''
 Welcome to the BETTER BEST BUY BATCH BUYING BOT (B6).
 
-STEP 1: Enter the URL(s) of your product page(s) into product_urls.txt. Adjust the FILENAME if needed.
-        Enter your credit card CVV (if desired for auto-checkout) here:
+STEP 1a: Enter the URL(s) of your product page(s) into /product_urls.txt.
+STEP 1b: Enter your credit card CVV (if desired for auto-checkout) here:
 '''
-FILENAME = r'./product_urls.txt'
-CVV = '361'
+#FILENAME = r'./product_urls.txt'
+FILENAME = r'./product_urls_test.txt'
+
+try:
+    from secret import CVV
+except:
+    CVV = '123'
 
 '''
 STEP 2: Provide the path to chromedriver.exe
@@ -34,11 +39,11 @@ SHORT_DELAY_2 = 6
 '''
 STEP 5: Set the following flags for how far the bot will proceed in the checkout process.
 '''
-AUTO_ADD_TO_CART = True     # Open the product page in Chrome and clicks the "Add to Cart" button
+AUTO_ADD_TO_CART = False     # Open the product page in Chrome and clicks the "Add to Cart" button
 AUTO_CHECKOUT = False        # Open the Shopping Cart page and clicks "Checkout". Fills in the CVV code.
 AUTO_PLACE_ORDER = False     # From the checkout page, clicks "Place Order". WARNING: THIS WILL MAKE THE PURCHASE AND CHARGE YOUR CC
 
-
+import alert
 import winsound
 import random
 import time
@@ -58,6 +63,8 @@ class Product:
         self.sku = url.split('skuId=')[1] # We use the SKU to find the right "Add to Cart" button, skipping over any recommended accessories.
         self.in_cart = False    # True after product successfully added to cart.
         self.checked_out = False
+        
+        self.last_notified = 0
 
         driver.switch_to.new_window('tab')
         driver.get(self.url)
@@ -92,7 +99,11 @@ class Product:
 
             if self.status == "Add to Cart":
             #Beep to alert user. Then open the product page in Chromedriver
-                beep()                
+                beep()
+                if time.time() - self.last_notified > 3600: # Only notify once per hour
+                    self.last_notified = time.time()
+                    alert.email_alert(f'{timestamp()} {self.title} is in stock! {self.url}')
+                    alert.pushover(f'{timestamp()} {self.title} is in stock! {self.url}')
                 return True
             else:
                 return False
@@ -249,6 +260,9 @@ if __name__ == "__main__":
     # Create Product List
     product_list = [Product(url, driver) for url in url_list]
     print(f'{timestamp()} Starting main loop for {len(product_list)} products...','\n')
+
+    alert.email_alert(f'{timestamp()} B6 Bot Started!')
+    alert.pushover(f'{timestamp()} B6 Bot Started!')
 
     while len(product_list) > 0:
         for product in product_list:
