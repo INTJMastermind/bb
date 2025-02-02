@@ -4,13 +4,13 @@ Welcome to the BETTER BEST BUY BATCH BUYING BOT (B6).
 STEP 1a: Enter the URL(s) of your product page(s) into /product_urls.txt.
 STEP 1b: Enter your credit card CVV (if desired for auto-checkout) here:
 '''
-#FILENAME = r'./product_urls.txt'
-FILENAME = r'./product_urls_test.txt'
+FILENAME = r'./product_urls.txt'
+#FILENAME = r'./product_urls_test.txt'
 
 try:
     from secret import CVV
 except:
-    CVV = '123'
+    CVV = ''
 
 '''
 STEP 2: Provide the path to chromedriver.exe
@@ -39,7 +39,7 @@ SHORT_DELAY_2 = 6
 '''
 STEP 5: Set the following flags for how far the bot will proceed in the checkout process.
 '''
-AUTO_ADD_TO_CART = False     # Open the product page in Chrome and clicks the "Add to Cart" button
+AUTO_ADD_TO_CART = True     # Open the product page in Chrome and clicks the "Add to Cart" button
 AUTO_CHECKOUT = False        # Open the Shopping Cart page and clicks "Checkout". Fills in the CVV code.
 AUTO_PLACE_ORDER = False     # From the checkout page, clicks "Place Order". WARNING: THIS WILL MAKE THE PURCHASE AND CHARGE YOUR CC
 
